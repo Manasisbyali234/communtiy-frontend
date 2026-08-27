@@ -32,7 +32,7 @@ import Avatar from '../../components/common/Avatar';
 import Button from '../../components/common/Button';
 import EventParticipantsSheet from '../../components/feed/EventParticipantsSheet';
 
-type ProfileTab = 'posts' | 'updates' | 'events' | 'family' | 'about';
+type ProfileTab = 'posts' | 'updates' | 'events' | 'communities' | 'family' | 'about';
 
 const COVER_HEIGHT = 190;
 
@@ -40,6 +40,7 @@ const TABS: { id: ProfileTab; label: string; icon: string }[] = [
   { id: 'about', label: 'About', icon: 'person-outline' },
   { id: 'posts', label: 'Posts', icon: 'grid-outline' },
   { id: 'events', label: 'Events', icon: 'calendar-outline' },
+  { id: 'communities', label: 'Communities', icon: 'globe-outline' },
   { id: 'family', label: 'Family', icon: 'people-outline' },
   { id: 'updates', label: 'Updates', icon: 'megaphone-outline' },
 ];
@@ -848,6 +849,27 @@ export default function ProfileScreen() {
                   </View>
                 );
               })}
+            </View>
+          )}
+
+          {/* COMMUNITIES TAB */}
+          {activeTab === 'communities' && (
+            <View style={[styles.modernCard, styles.emptyCard, { backgroundColor: SURF, borderColor: BORDER }]}>
+              <View style={[styles.emptyIconCircle, { backgroundColor: '#7C3AED14', width: 68, height: 68, borderRadius: 34 }]}>
+                <Ionicons name="globe-outline" size={34} color="#7C3AED" />
+              </View>
+              <Text style={[styles.emptyTitle, { color: TEXT, marginTop: 4 }]}>Your Communities</Text>
+              <Text style={[styles.emptySubtitle, { color: TEXT2, paddingHorizontal: 16 }]}>
+                You are part of {user?.communitiesCount || 0} communities. Discover and join more groups in the community directory.
+              </Text>
+              <Button
+                title="Browse Communities"
+                icon="globe-outline"
+                variant="primary"
+                size="md"
+                onPress={() => router.push('/(tabs)/explore?tab=communities' as any)}
+                style={{ marginTop: 12 }}
+              />
             </View>
           )}
 

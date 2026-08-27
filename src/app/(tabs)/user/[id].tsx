@@ -33,10 +33,11 @@ import { Share } from 'react-native';
 const { width: SW } = Dimensions.get('window');
 const COVER_HEIGHT = 175;
 
-type ProfileTab = 'posts' | 'events' | 'about';
+type ProfileTab = 'posts' | 'events' | 'communities' | 'about';
 const TABS: { id: ProfileTab; label: string; icon: string }[] = [
   { id: 'posts', label: 'Posts', icon: 'grid-outline' },
   { id: 'events', label: 'Events', icon: 'calendar-outline' },
+  { id: 'communities', label: 'Communities', icon: 'globe-outline' },
   { id: 'about', label: 'About', icon: 'person-outline' },
 ];
 
@@ -218,6 +219,16 @@ export default function UserProfileScreen() {
                     onPress={() => router.push(`/chat/new?participantId=${user.id}` as any)}
                   >
                     <Ionicons name="chatbubble-ellipses-outline" size={17} color={TEXT} />
+                  </Pressable>
+                  <Pressable
+                    accessibilityLabel="View communities"
+                    style={({ pressed }) => [
+                      styles.iconUtilityButton,
+                      { borderColor: '#8B5CF6', backgroundColor: pressed ? '#8B5CF620' : '#8B5CF612' },
+                    ]}
+                    onPress={() => router.push('/(tabs)/explore?tab=communities' as any)}
+                  >
+                    <Ionicons name="globe-outline" size={17} color="#8B5CF6" />
                   </Pressable>
                 </>
               )}
@@ -464,6 +475,27 @@ export default function UserProfileScreen() {
                 <Text style={[styles.emptySubtitle, { color: TEXT3 }]}>{user.displayName} has not joined any events yet.</Text>
               </View>
             )
+          )}
+
+          {/* COMMUNITIES TAB */}
+          {activeTab === 'communities' && (
+            <View style={[styles.modernCard, styles.emptyCard, { backgroundColor: SURF, borderColor: BORDER }]}>
+              <View style={[styles.emptyIconCircle, { backgroundColor: '#8B5CF614' }]}>
+                <Ionicons name="globe-outline" size={32} color="#8B5CF6" />
+              </View>
+              <Text style={[styles.emptyTitle, { color: TEXT }]}>Communities</Text>
+              <Text style={[styles.emptySubtitle, { color: TEXT3 }]}>
+                {user.displayName} is part of {user.communitiesCount || 0} communities.
+              </Text>
+              <Button
+                title="Browse Communities"
+                icon="globe-outline"
+                variant="primary"
+                size="md"
+                onPress={() => router.push('/(tabs)/explore?tab=communities' as any)}
+                style={{ marginTop: 12 }}
+              />
+            </View>
           )}
 
           {/* ABOUT TAB */}
