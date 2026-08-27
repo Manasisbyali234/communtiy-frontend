@@ -114,16 +114,16 @@ export default function AdminReferrals() {
       if (sharesRes?.data?.data && Array.isArray(sharesRes.data.data) && sharesRes.data.data.length > 0) {
         setShares(sharesRes.data.data);
       } else {
-        setShares(MOCK_SHARES);
+        setShares([]);
       }
       if (referralsRes?.data?.data && Array.isArray(referralsRes.data.data) && referralsRes.data.data.length > 0) {
         setReferrals(referralsRes.data.data);
       } else {
-        setReferrals(MOCK_REFERRALS);
+        setReferrals([]);
       }
     } catch {
-      setShares(MOCK_SHARES);
-      setReferrals(MOCK_REFERRALS);
+      setShares([]);
+      setReferrals([]);
     } finally {
       setLoading(false);
     }
@@ -133,10 +133,49 @@ export default function AdminReferrals() {
 
   // Analytics Metrics
   const statsOverview = useMemo(() => {
-    const totalShares = shares.length || 24;
-    const totalConversions = referrals.length || 10;
+    const totalShares = shares.length;
+    const totalConversions = referrals.length;
     const rate = totalShares > 0 ? ((totalConversions / totalShares) * 100).toFixed(1) : '0.0';
     return { totalShares, totalConversions, rate };
+  }, [shares, referrals]);
+
+  const leaderboard = useMemo(() => {
+    const bySharer = new Map<string, { name: string; email: string; invitesSent: number; successfulJoins: number }>();
+
+    shares.forEach((share) => {
+      const id = share.sharer?.id;
+      if (!id) return;
+      const existing = bySharer.get(id) ?? {
+        name: share.sharer.displayName || 'Community Member',
+        email: share.sharer.email || '—',
+        invitesSent: 0,
+        successfulJoins: 0,
+      };
+      existing.invitesSent += 1;
+      bySharer.set(id, existing);
+    });
+
+    referrals.forEach((referral) => {
+      const id = referral.referredBy?.id;
+      if (!id) return;
+      const existing = bySharer.get(id) ?? {
+        name: referral.referredBy.displayName || 'Community Member',
+        email: referral.referredBy.email || '—',
+        invitesSent: 0,
+        successfulJoins: 0,
+      };
+      existing.successfulJoins += 1;
+      bySharer.set(id, existing);
+    });
+
+    return [...bySharer.values()]
+      .sort((a, b) => b.successfulJoins - a.successfulJoins || b.invitesSent - a.invitesSent)
+      .map((entry, index) => ({
+        ...entry,
+        rank: index + 1,
+        conversionRate: entry.invitesSent > 0 ? `${((entry.successfulJoins / entry.invitesSent) * 100).toFixed(1)}%` : '0.0%',
+        badge: index === 0 ? 'Gold Champion' : index === 1 ? 'Silver Champion' : index === 2 ? 'Bronze Champion' : 'Advocate',
+      }));
   }, [shares, referrals]);
 
   const filteredShares = useMemo(() => {
@@ -438,8 +477,13 @@ export default function AdminReferrals() {
           )
         ) : (
           /* Leaderboard Tab */
+          leaderboard.length === 0 ? (
+            <View style={s.cardWrapper}>
+              <EmptyState message="No referral activity yet." />
+            </View>
+          ) : (
           <View style={s.mobileListWrap}>
-            {MOCK_LEADERBOARD.map((lead) => (
+            {leaderboard.map((lead) => (
               <View key={lead.rank} style={s.leaderCard}>
                 <View style={s.rankBadge}>
                   <Text style={s.rankNum}>#{lead.rank}</Text>
@@ -462,6 +506,7 @@ export default function AdminReferrals() {
               </View>
             ))}
           </View>
+          )
         )}
       </View>
     </AdminShell>

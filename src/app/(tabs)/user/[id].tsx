@@ -297,6 +297,7 @@ export default function UserProfileScreen() {
                 icon: 'globe',
                 color: '#8B5CF6',
                 bg: '#8B5CF614',
+                onPress: () => router.push('/(tabs)/explore?tab=communities' as any),
               },
               {
                 label: 'Helped',
@@ -320,19 +321,22 @@ export default function UserProfileScreen() {
                 bg: '#F59E0B14',
               },
             ].map((stat, index, arr) => (
-              <View
+              <TouchableOpacity
                 key={stat.label}
                 style={[
                   styles.statBlock,
                   index % 3 !== 2 && { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: BORDER },
                 ]}
+                onPress={'onPress' in stat ? stat.onPress : undefined}
+                disabled={!('onPress' in stat && stat.onPress)}
+                activeOpacity={0.7}
               >
                 <View style={[styles.statIconBadge, { backgroundColor: stat.bg }]}>
                   <Ionicons name={stat.icon as any} size={15} color={stat.color} />
                 </View>
                 <Text style={[styles.statValue, { color: TEXT }]}>{stat.value}</Text>
                 <Text style={[styles.statLabel, { color: TEXT3 }]}>{stat.label}</Text>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         </View>

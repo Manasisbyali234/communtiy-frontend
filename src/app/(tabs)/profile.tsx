@@ -395,6 +395,14 @@ export default function ProfileScreen() {
                 onPress: () => router.push('/jobs/my-applications' as any),
               },
               {
+                label: 'Communities',
+                value: (user?.communitiesCount || 0).toString(),
+                icon: 'globe',
+                color: '#7C3AED',
+                bg: '#7C3AED14',
+                onPress: () => router.push('/(tabs)/explore?tab=communities' as any),
+              },
+              {
                 label: 'Helped',
                 value: (user?.helpCount || 0).toString(),
                 icon: 'heart',
